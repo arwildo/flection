@@ -10,11 +10,6 @@ import (
     "bufio"
 )
 
-var (
-    Green   = "\033[1;32m%s\033[0m"
-    Yellow  = "\033[1;33m%s\033[0m"
-)
-
 func main() {
     arg := os.Args
 
@@ -30,25 +25,26 @@ func main() {
         scanner := bufio.NewScanner(file)
 
         // Send Request for each line
-        for scanner.Scan() { 
+        for scanner.Scan() {
             resp, err := http.Get(scanner.Text())
 
             // Get Respon
-            defer resp.Body.Close()
-            body, err := ioutil.ReadAll(resp.Body)
-            if err != nil {
-                log.Fatal(err)
-            }
+            if err == nil {
+                body, err := ioutil.ReadAll(resp.Body)
+                if err != nil {
+                    log.Fatal(err)
+                }
+                defer resp.Body.Close()
 
-            // Search for keyword
-            if strings.Contains(string(body), "FUZZ") {
-                fmt.Println(scanner.Text(), "  ", resp.StatusCode, http.StatusText(resp.StatusCode), "  ", "\033[1;32mFound Reflection!\033[0m")
+                // Search for keyword
+                if strings.Contains(string(body), "FUZZ") {
+                    fmt.Printf("%s [%d %s] \033[1;32mFound Reflection!\033[0m\n", scanner.Text(), resp.StatusCode, http.StatusText(resp.StatusCode))
+                } else {
+                    fmt.Printf("%s [%d %s] \033[1;33mNo Reflection\033[0m\n", scanner.Text(), resp.StatusCode, http.StatusText(resp.StatusCode))
+                }
             } else {
-                fmt.Println(scanner.Text(), "  ", resp.StatusCode, http.StatusText(resp.StatusCode), "  ", "\033[1;33mNo Reflection\033[0m")
+                fmt.Printf("%s \033[1;31mCan't be Reached\033[0m\n", scanner.Text())
             }
-        }
-        if err != nil {
-            log.Fatal(err)
         }
     } else {
         fmt.Println("No file were specified.")
