@@ -48,7 +48,7 @@ func main() {
                 // Search for keyword
                 if strings.Contains(string(body), "FUZZ") {
                     fmt.Printf("%s [%d %s] \033[1;32mFound Reflection!\033[0m\n", scanner.Text(), resp.StatusCode, http.StatusText(resp.StatusCode))
-                    fmt.Fprintf(w, "%s\n", scanner.Text())
+                    fmt.Fprintf(w, "%s [%d %s]\n", scanner.Text())
                     w.Flush()
                 } else {
                     fmt.Printf("%s [%d %s] \033[1;33mNo Reflection\033[0m\n", scanner.Text(), resp.StatusCode, http.StatusText(resp.StatusCode))
